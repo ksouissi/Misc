@@ -52,6 +52,6 @@ int main(int argc, char *argv[])
 		b = atoi(argv[2]);
 		printf("%d/%d = %d\n%d%%%d = %d", a, b, idiv2(a, b), a, b, mod(a, b));
 	} else
-		printf("Usage: divmod <integer> <non-zero-integer>");
+		printf("Usage: divmod.exe <integer> <non-zero-integer>");
 	return 0;
 }
