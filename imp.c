@@ -1,6 +1,6 @@
 #if 0
 .exe: imp.c
-	cl /TC /O1 /FA /Fmimp.map $** /link /nodefaultlib /entry:mainCRTStartup /subsystem:console /merge:.data=.text /align:8
+	cl /TC /O1 /FA /Fmimp.map $** /link /nodefaultlib /entry:mainCRTStartup /subsystem:console /merge:.data=.text /align:4
 	del imp.obj
 !if 0
 #endif
