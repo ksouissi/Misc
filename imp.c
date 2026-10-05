@@ -43,9 +43,9 @@ int __stdcall mainCRTStartup()	/* defined(LOADLIBRARYA) => v0: 184B, v1:  */
 		j ^= j;	/**/
 		__asm {
 			mov	eax, fs:[0x30]	/* EBX = TEB->ProcessEnvironmentBlock */
-			mov eax, [eax+0xc]		/* EBX = TEB->ProcessEnvironmentBlock->Ldr */
-			mov	eax, [eax+0xc]		/* EBX = TEB->ProcessEnvironmentBlock->Ldr->InLoadOrderModuleList.Flink */
-			mov	m, eax				/* &m->loadapi5.exe.LDR_DATA_TABLE_ENTRY */
+			mov eax, [eax+0xc]	/* EBX = TEB->ProcessEnvironmentBlock->Ldr */
+			mov	eax, [eax+0xc]	/* EBX = TEB->ProcessEnvironmentBlock->Ldr->InLoadOrderModuleList.Flink */
+			mov	m, eax			/* &m->loadapi5.exe.LDR_DATA_TABLE_ENTRY */
 		}
 		for (;;) {	/* does not check for end-of-module-list */
 			{
