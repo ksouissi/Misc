@@ -1,6 +1,6 @@
 #if 0
 .exe: imp.c
-	cl /TC /O1 /FA /Fmimp.map $** /link /nodefaultlib /entry:mainCRTStartup /subsystem:console /merge:.data=.text /align:4
+	cl /TC /O1 /FA /Fmimp.map $** /link /nodefaultlib /entry:mainCRTStartup /subsystem:console /merge:.data=.text /align:8
 	del imp.obj
 !if 0
 #endif
@@ -32,10 +32,10 @@ int __stdcall mainCRTStartup()	/* defined(LOADLIBRARYA) => v0: 184B, v1:  */
 	short *fo;	/* short []: fa indices */
 #ifdef LOADLIBRARYA
 	/* int k; */
-	__asm enter	20, 0	/* CL 12.00.8804 /Ogsy: 5-stack */
-	/* k = sizeof(libs)/sizeof(char *); */
-#else
+#endif
 	__asm enter 16, 0	/* CL 12.00.8804 /Ogsy: 4-stack */
+#ifdef	LOADLIBRARYA
+	/* k = sizeof(libs)/sizeof(char *); */
 #endif
 	i = /* sizeof(f)/sizeof(int)-1 */f;
 	do {	/* reset search: f array not sorted
