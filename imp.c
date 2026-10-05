@@ -40,7 +40,7 @@ int __stdcall mainCRTStartup()	/* defined(LOADLIBRARYA) => v0: 184B, v1:  */
 	i = /* sizeof(f)/sizeof(int)-1 */f;
 	do {	/* reset search: f array not sorted
 				no forwarding */
-		j ^= j;
+		/* */ j ^= j; /* */
 		__asm {
 			xor	eax, eax
 			mov	ebx, fs:[eax+0x30]	/* EBX = TEB->ProcessEnvironmentBlock */
@@ -55,16 +55,17 @@ int __stdcall mainCRTStartup()	/* defined(LOADLIBRARYA) => v0: 184B, v1:  */
 				n = *(int *)(m + 0x18);	/* m->DllBase */
 				x = n + *(int *)(n + *(int *)(n + 0x3c) + 0x78 /* = Signature: 4 + IMAGE_FILE_HEADER: 20 + IMAGE_OPTIONAL_HEADER: 96 == 120 */);	/* x = &m->IMAGE_EXPORT_DIRECTORY */
 				/* fn is sorted */
-				fa = (int *)(n + *(int *)(x + 0x1c));	/* fa = x->AddressOfFunctions (char *[]) */
-				fn = (int *)(n + *(int *)(x + 0x20));	/* fn = x->AddressOfNames */
-				fo = (short *)(n + *(int *)(x + 0x24));	/* fo = x->AddressOfNameOrdinals */
 				j = *(int *)(x + 0x18)-1;	/* j = x->NumberOfNames-1 */
+				fa = (int *)(n + *(int *)(x + 0x1c));	/* fa = x->AddressOfFunctions (char *[]) */
+				fn = (int *)(n + *(int *)(x + 0x20))/* +j */;	/* fn = x->AddressOfNames */
+				fo = (short *)(n + *(int *)(x + 0x24))/* +j */;	/* fo = x->AddressOfNameOrdinals */
+				/* j = n + *(int *)(x + 0x20); */	/* j = fn-j; */
 			}
 			{	/* exports != {} */
 				int h;
 				do {		
 					{	/* ror13 */
-						char *a = (char *)(n + fn[j]);	/* a && *a */
+						char *a = (char *)(n + /* *fn */fn[j]);	/* a && *a */
 						h ^= h;
 						do {
 							h = ((unsigned)h >> 13 | h << 32 - 13) + *a++;
@@ -72,7 +73,7 @@ int __stdcall mainCRTStartup()	/* defined(LOADLIBRARYA) => v0: 184B, v1:  */
 					}
 					if (h == /* f[i] */*(int *)i) {
 						/* f[i] = n + fa[fo[j]]; */
-						*i = n + fa[fo[j]];
+						*i = n + fa[/* *fo */fo[j]];
 						/* case LoadLibraryA: load all imported libraries */
 #ifdef LOADLIBRARYA
 #if 0	/* v0 */
@@ -96,7 +97,7 @@ int __stdcall mainCRTStartup()	/* defined(LOADLIBRARYA) => v0: 184B, v1:  */
 #endif
 						goto L0;
 					}
-				} while (j--);
+				} while (/* fo--, fn-- != j */j--);
 			}
 		}
 L0:;
