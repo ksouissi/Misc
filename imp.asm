@@ -143,7 +143,6 @@ L4:
 	je	L6
 	push	edi
 	call	ebx
-	inc edi
 	repne scasb
 	mov	[esp+4], edi
 	jmp	L4
@@ -151,20 +150,19 @@ L6:
 	pop	eax
 	cmp	DWORD PTR [esi], 0
 	jne	L0
-;												132 <= 144: API-loader code within head-start
+;												131 <= 144: API-loader code within head-start
 	; Hello
 	push	0
 	push	0
 	push	13
 	push	OFFSET (IMGBASE+hello)
 	push	-11
-	call	DWORD PTR [IMGBASE+f+4];64]
+	call	DWORD PTR [IMGBASE+f+64]	; IMGBASE+f+4
 	push	eax
-	call	DWORD PTR [IMGBASE+f];+60]
+	call	DWORD PTR [IMGBASE+f+60]	; IMGBASE+f
 	; , world!
 	add	esp, 4
 	ret
-COMMENT	^
 f	DD	0ec0e4e8eh	; LoadLibraryA
 	DD	0eb66a115h	; BitBlt
 	DD	0690a1701h	; DispatchMessageA
@@ -184,11 +182,12 @@ f	DD	0ec0e4e8eh	; LoadLibraryA
 	DD	07487d823h	; GetStdHandle
 	DD	0h
 libs	DB	'user32.dll', 0h, 'gdi32.dll', 0h, 0h
-^
+COMMENT	^
 f	DD	0e80a791fh	; WriteFile
 	DD	07487d823h	; GetStdHandle
 	DD	0h
 libs	DB	0h
+^
 hello	DB	'Hello, world!'
 EOF:
 _TEXT	ENDS
