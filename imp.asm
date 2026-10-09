@@ -106,21 +106,22 @@ L1:
 	mov	ebp, [ebx + ebp + 78h]
 	add	ebp, ebx			; ebp == x
 	mov	ecx, [ebp + 18h]	; ecx == j
-L2:
+	xor	eax, eax
+L2:	; eax == 0
 	push	esi
 	mov	esi, [ebp + 20h]
 	lea esi, [esi + ecx*4 - 4]
 	mov	esi, [ebx + esi]
 	add	esi, ebx
-	xor	eax, eax
 	cdq
 L3:
 	lodsb
+	or	al, al
+	jz	L7
 	ror	edx, 13
 	add	edx, eax
-	cmp	BYTE PTR [esi], 0
-	jne	L3
-	lodsb	; al = 0
+	jmp	L3
+L7:
 	pop	esi
 	cmp	edx, DWORD PTR [esi]
 	je	L5
@@ -138,9 +139,11 @@ L5:
 	mov	[esi], ebx
 	add	esi, 4
 	mov	edi, [esp+4]	; esp+4 -> libs
+	; eax == 0
 L4:
-	cmp	BYTE PTR [edi], 0
-	je	L6
+	scasb
+	jz	L6
+	dec	edi
 	push	edi
 	call	ebx
 	repne scasb
@@ -150,7 +153,7 @@ L6:
 	pop	eax
 	cmp	DWORD PTR [esi], 0
 	jne	L0
-;												131 <= 144: API-loader code within head-start
+;												130 <= 144: API-loader code within head-start
 	; Hello
 	push	0
 	push	0
