@@ -88,90 +88,83 @@ IMAGE_OPTIONAL_HEADER:
 	DD	0	; 16 NumberOfRvaAndSizes			92
 ;												96
 IMAGE_DATA_DIRECTORY:
-;	0
+; 0
 IMAGE_SECTION_HEADER:
-;	0
+; 0
 EOH:	; 124, 268-124 = 144 head-start
-	push	OFFSET (IMGBASE+libs)
-	mov		ebp, OFFSET (IMGBASE+f)
+	push	OFFSET (IMGBASE+libs)	;			0
+	mov		esi, OFFSET (IMGBASE+f)
 L0:
-	mov		eax, fs:[30h]
-	mov		eax, [eax + 0ch]
-	mov		eax, [eax + 0ch]
+	mov	eax, fs:[30h]
+	mov	eax, [eax + 0ch]
+	mov	eax, [eax + 0ch]
 L1:
-	mov		eax, [eax]			; eax == m
+	mov	eax, [eax]			; eax == m
 	push	eax
-	mov		ebx, [eax + 18h]	; ebx == n
-	mov		ecx, [ebx + 3ch]
-	mov		ecx, [ebx + ecx + 78h]
-	add		ecx, ebx			; ecx == x
-	mov		eax, [ecx + 18h]	; eax == j
-	mov		edx, [ecx + 24h]
-	mov		esi, [ecx + 20h]
-	mov		edi, [ecx + 1ch]
-	lea		ecx, [ebx + esi]	; ecx == fn
-	lea		edx, [edx + 2*eax]	; edx == fo+j
-	lea		esi, [esi + 4*eax]	; esi == fn+j
-	add		edx, ebx
-	add		esi, ebx
-	add		edi, ebx			; edi == fa
+	mov	ebx, [eax + 18h]	; ebx == n
+	mov	ebp, [ebx + 3ch]
+	mov	ebp, [ebx + ebp + 78h]
+	add	ebp, ebx			; ebp == x
+	mov	ecx, [ebp + 18h]	; ecx == j
 L2:
-	sub		esi, 4
-	dec		edx
-	dec		edx
-	push	edx
 	push	esi
-	mov		esi, [esi]
-	add		esi, ebx
-	xor		eax, eax
+	mov	esi, [ebp + 20h]
+	lea esi, [esi + ecx*4 - 4]
+	mov	esi, [ebx + esi]
+	add	esi, ebx
+	xor	eax, eax
 	cdq
 L3:
 	lodsb
-	ror		edx, 13
-	add		edx, eax
-	cmp		BYTE PTR [esi], 0
-	jnz		L3
-	cmp		edx, [ebp]
-	pop		esi
-	pop		edx
-	jne		L5
-	movzx	eax, WORD PTR [edx]
-	mov		eax, [edi + eax*4]
-	add		eax, ebx
-	mov		[ebp], eax
-	mov		edi, [esp+4]	; esp+4 -> libs[k]
-	xor		eax, eax
-L4:
-	cmp		BYTE PTR [edi], 0
-	je		L6
-	push	edi
-	call	DWORD PTR [ebp]
-	inc		edi
-	repne scasb
-	jmp		L4
+	ror	edx, 13
+	add	edx, eax
+	cmp	BYTE PTR [esi], 0
+	jne	L3
+	lodsb	; al = 0
+	pop	esi
+	cmp	edx, DWORD PTR [esi]
+	je	L5
+	loop	L2
+	pop	eax
+	jmp	L1
 L5:
-	cmp		esi, ecx
-	jne		L2
-	pop		eax
-	jmp		L1
+	mov	edx, [ebp + 24h]
+	lea	edx, [edx + ecx*2 - 2]
+	movzx edx, WORD PTR [ebx + edx]
+	mov	edi, [ebp + 1ch]
+	lea	edx, [edi + edx*4]
+	mov	edx, [ebx + edx]
+	add	ebx, edx
+	mov	[esi], ebx
+	add	esi, 4
+	mov	edi, [esp+4]	; esp+4 -> libs
+L4:
+	cmp	BYTE PTR [edi], 0
+	je	L6
+	push	edi
+	call	ebx
+	inc edi
+	repne scasb
+	mov	[esp+4], edi
+	jmp	L4
 L6:
-	mov		[esp+4], edi
-	add		ebp, 4
-	cmp		DWORD PTR [ebp], 0
-	pop		eax
-	jne		L0
+	pop	eax
+	cmp	DWORD PTR [esi], 0
+	jne	L0
+;												132 <= 144: API-loader code within head-start
 	; Hello
 	push	0
 	push	0
 	push	13
 	push	OFFSET (IMGBASE+hello)
 	push	-11
-	call	DWORD PTR [IMGBASE+f+64]
+	call	DWORD PTR [IMGBASE+f+4];64]
 	push	eax
-	call	DWORD PTR [IMGBASE+f+60]
+	call	DWORD PTR [IMGBASE+f];+60]
 	; , world!
 	add	esp, 4
 	ret
+COMMENT	^
 f	DD	0ec0e4e8eh	; LoadLibraryA
 	DD	0eb66a115h	; BitBlt
 	DD	0690a1701h	; DispatchMessageA
@@ -191,6 +184,11 @@ f	DD	0ec0e4e8eh	; LoadLibraryA
 	DD	07487d823h	; GetStdHandle
 	DD	0h
 libs	DB	'user32.dll', 0h, 'gdi32.dll', 0h, 0h
+^
+f	DD	0e80a791fh	; WriteFile
+	DD	07487d823h	; GetStdHandle
+	DD	0h
+libs	DB	0h
 hello	DB	'Hello, world!'
 EOF:
 _TEXT	ENDS
