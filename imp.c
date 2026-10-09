@@ -40,7 +40,7 @@ int __stdcall mainCRTStartup()	/* defined(LOADLIBRARYA) => v0: 184B, v1:  */
 	i = /* sizeof(f)/sizeof(int)-1 */f;
 	do {	/* reset search: f array not sorted
 				no forwarding */
-		j ^= j;	/**/
+		/* j ^= j; */
 		__asm {
 			mov	eax, fs:[0x30]	/* EBX = TEB->ProcessEnvironmentBlock */
 			mov eax, [eax+0xc]	/* EBX = TEB->ProcessEnvironmentBlock->Ldr */
