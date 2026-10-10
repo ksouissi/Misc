@@ -93,7 +93,7 @@ IMAGE_SECTION_HEADER:
 ; 0
 EOH:	; 124, 268-124 = 144 head-start
 	push	OFFSET (IMGBASE+libs)	;			0
-	mov		esi, OFFSET (IMGBASE+f)
+	mov		edi, OFFSET (IMGBASE+f+4)
 L0:
 	mov	eax, fs:[30h]
 	mov	eax, [eax + 0ch]
@@ -108,7 +108,6 @@ L1:
 	mov	ecx, [ebp + 18h]	; ecx == j
 	xor	eax, eax
 L2:	; eax == 0
-	push	esi
 	mov	esi, [ebp + 20h]
 	lea esi, [esi + ecx*4 - 4]
 	mov	esi, [ebx + esi]
@@ -122,8 +121,7 @@ L3:
 	add	edx, eax
 	jmp	L3
 L7:
-	pop	esi
-	cmp	edx, DWORD PTR [esi]
+	cmp	edx, DWORD PTR [edi-4]
 	je	L5
 	loop	L2
 	pop	eax
@@ -132,28 +130,29 @@ L5:
 	mov	edx, [ebp + 24h]
 	lea	edx, [edx + ecx*2 - 2]
 	movzx edx, WORD PTR [ebx + edx]
+	mov	esi, edi
 	mov	edi, [ebp + 1ch]
 	lea	edx, [edi + edx*4]
 	mov	edx, [ebx + edx]
 	add	ebx, edx
-	mov	[esi], ebx
-	add	esi, 4
-	mov	edi, [esp+4]	; esp+4 -> libs
+	mov	[esi-4], ebx
+	mov	edi, [esp+4]	; esp -> libs
 	; eax == 0
 L4:
 	scasb
 	jz	L6
 	dec	edi
 	push	edi
-	call	ebx
+	call	ebx	; ebx not altered
 	repne scasb
 	mov	[esp+4], edi
 	jmp	L4
 L6:
+	mov	edi, esi
+	scasd
 	pop	eax
-	cmp	DWORD PTR [esi], 0
-	jne	L0
-;												130 <= 144: API-loader code within head-start
+	jnz	L0
+;												129 <= 144: API-loader code within head-start
 	; Hello
 	push	0
 	push	0
