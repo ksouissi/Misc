@@ -97,9 +97,9 @@ EOH:	; 124, 268-124 = 144 head-start
 L0:
 	mov	eax, fs:[30h]
 	mov	eax, [eax + 0ch]
-	mov	eax, [eax + 0ch]
+	mov	esi, [eax + 0ch]
 L1:
-	mov	eax, [eax]			; eax == m
+	lodsd			; eax == m
 	push	eax
 	mov	ebx, [eax + 18h]	; ebx == n
 	mov	ebp, [ebx + 3ch]
@@ -124,7 +124,7 @@ L7:
 	cmp	edx, DWORD PTR [edi-4]
 	je	L5
 	loop	L2
-	pop	eax
+	pop	esi
 	jmp	L1
 L5:
 	mov	edx, [ebp + 24h]
@@ -150,9 +150,9 @@ L4:
 L6:
 	mov	edi, esi
 	scasd
-	pop	eax
+	pop	eax	; don't care
 	jnz	L0
-;												129 <= 144: API-loader code within head-start
+;												128 <= 144: API-loader code within head-start
 	; Hello
 	push	0
 	push	0
