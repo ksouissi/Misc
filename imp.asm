@@ -1,10 +1,14 @@
-COMMENT	^
-Works as intented on: Windows 10 Version 21H2 (OS Build 19044.5371)
-Example build commands:
-ML /c imp.asm
-LINK16 /TINY imp.obj,imp.exe,,,,
-DEL imp.obj
-^
+; @ECHO OFF
+; ML /nologo /c imp.bat
+; LINK16 /NOLOGO /TINY imp.obj, imp.exe,,,,
+; DEL imp.obj
+; imp.exe
+; ECHO.
+; DIR imp.exe | FIND "imp.exe"
+; EXIT /B
+
+; Works as intented on: Windows 10 Version 21H2 (OS Build 19044.5371)
+
 IMAGE_DOS_SIGNATURE	EQU	5a4dh	; MZ
 
 IMAGE_NT_SIGNATURE	EQU	00004550h	; PE00
