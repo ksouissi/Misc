@@ -1,10 +1,10 @@
 ; @ECHO OFF
-; ML /nologo /c imp.bat
+; ML /nologo /c /Flimp.lst imp.bat
 ; LINK16 /NOLOGO /TINY imp.obj, imp.exe,,,,
-; DEL imp.obj
 ; imp.exe
 ; ECHO.
 ; DIR imp.exe | FIND "imp.exe"
+; DEL imp.exe imp.obj
 ; EXIT /B
 
 ; Works as intented on: Windows 10 Version 21H2 (OS Build 19044.5371)
@@ -140,7 +140,8 @@ L5:
 	mov	edx, [ebx + edx]
 	add	ebx, edx
 	mov	[esi-4], ebx
-	mov	edi, [esp+4]	; esp -> libs
+	pop	ebp	; => [esp] instead of [esp+4]
+	mov	edi, [esp]	; esp -> libs
 	; eax == 0
 L4:
 	scasb
@@ -149,14 +150,13 @@ L4:
 	push	edi
 	call	ebx	; ebx not altered
 	repne scasb
-	mov	[esp+4], edi
+	mov	[esp], edi
 	jmp	L4
 L6:
 	mov	edi, esi
 	scasd
-	pop	eax	; don't care
 	jnz	L0
-;												128 <= 144: API-loader code within head-start
+;												126 <= 144: API-loader code within head-start
 	; Hello
 	push	0
 	push	0
