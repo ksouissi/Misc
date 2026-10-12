@@ -95,6 +95,7 @@ IMAGE_DATA_DIRECTORY:
 ; 0
 IMAGE_SECTION_HEADER:
 ; 0
+
 EOH:	; 124, 268-124 = 144 head-start
 	push	OFFSET (IMGBASE+libs)	;			0
 	mov		edi, OFFSET (IMGBASE+f+4)
@@ -132,16 +133,18 @@ L7:
 	jmp	L1
 L5:
 	mov	edx, [ebp + 24h]
-	lea	edx, [edx + ecx*2 - 2]
+	dec	ecx
+	lea	edx, [edx + ecx*2]
 	movzx edx, WORD PTR [ebx + edx]
-	mov	esi, edi
-	mov	edi, [ebp + 1ch]
-	lea	edx, [edi + edx*4]
+	mov	ecx, [ebp + 1ch]
+	lea	edx, [ecx + edx*4]
 	mov	edx, [ebx + edx]
 	add	ebx, edx
-	mov	[esi-4], ebx
-	pop	ebp	; => [esp] instead of [esp+4]
-	mov	edi, [esp]	; esp -> libs
+	mov	[edi-4], ebx
+	mov	esi, edi
+	pop	ecx	; mod
+	pop	edi	; libs
+	push	edi
 	; eax == 0
 L4:
 	scasb
@@ -156,7 +159,7 @@ L6:
 	mov	edi, esi
 	scasd
 	jnz	L0
-;												126 <= 144: API-loader code within head-start
+;												125 <= 144: API-loader code within head-start
 	; Hello
 	push	0
 	push	0
