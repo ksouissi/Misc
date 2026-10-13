@@ -105,14 +105,15 @@ L0:
 	mov	esi, [eax + 0ch]
 L1:
 	lodsd			; eax == m
-	push	eax
 	mov	ebx, [eax + 18h]	; ebx == n
 	mov	ebp, [ebx + 3ch]
 	mov	ebp, [ebx + ebp + 78h]
 	add	ebp, ebx			; ebp == x
 	mov	ecx, [ebp + 18h]	; ecx == j
+	xchg	eax, esi
 	xor	eax, eax
-L2:	; eax == 0
+L2:
+	push	esi
 	mov	esi, [ebp + 20h]
 	lea esi, [esi + ecx*4 - 4]
 	mov	esi, [ebx + esi]
@@ -126,10 +127,10 @@ L3:
 	add	edx, eax
 	jmp	L3
 L7:
+	pop	esi
 	cmp	edx, DWORD PTR [edi-4]
 	je	L5
 	loop	L2
-	pop	esi
 	jmp	L1
 L5:
 	mov	edx, [ebp + 24h]
@@ -141,8 +142,7 @@ L5:
 	mov	edx, [ebx + edx]
 	add	ebx, edx
 	mov	[edi-4], ebx
-	mov	esi, edi
-	pop	ecx	; mod
+	mov	ebp, edi
 	pop	edi	; libs
 	push	edi
 	; eax == 0
@@ -156,10 +156,10 @@ L4:
 	mov	[esp], edi
 	jmp	L4
 L6:
-	mov	edi, esi
+	mov	edi, ebp
 	scasd
 	jnz	L0
-;												125 <= 144: API-loader code within head-start
+;												125
 	; Hello
 	push	0
 	push	0
