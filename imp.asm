@@ -95,7 +95,6 @@ IMAGE_DATA_DIRECTORY:
 ; 0
 IMAGE_SECTION_HEADER:
 ; 0
-
 EOH:	; 124, 268-124 = 144 head-start
 	push	OFFSET (IMGBASE+libs)	;			0
 	mov		edi, OFFSET (IMGBASE+f+4)
